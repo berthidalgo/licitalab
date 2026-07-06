@@ -56,3 +56,37 @@ pip install -r requirements.txt
 **Plan de 14 días:**
 - Semana 1: Backend + Data + ML
 - Semana 2: RAG + Alertas + Frontend + Despliegue
+
+## Despliegue en Render (Backend)
+
+1. Ve a [Render](https://dashboard.render.com) y conecta tu repo `berthidalgo/licitalab`.
+
+2. Usa el archivo `render.yaml` que ya está en la raíz (Blueprint).
+
+3. En el dashboard de Render, agrega las variables de entorno (NUNCA las subas al repo):
+   - `SUPABASE_URL`
+   - `SUPABASE_KEY` (usa la **service_role** key)
+   - `DATABASE_URL`
+   - `ENV=production`
+   - `DEBUG=false`
+
+4. El servicio se llamará `licitai-peru-api` por defecto.
+
+### Comando manual (si no usas render.yaml)
+- **Build Command**: `pip install -r backend/requirements.txt`
+- **Start Command**: `cd backend && uvicorn main:app --host 0.0.0.0 --port $PORT`
+
+### Health check
+El endpoint `/health` ya está implementado.
+
+## Variables de entorno importantes
+Copia de `.env.example` y renómbralo a `.env` localmente.
+Nunca subas `.env` ni archivos con tokens.
+
+## Render API Key
+Si guardaste tu Render API Key, úsala para automatizar despliegues futuros con el CLI de Render:
+```bash
+render deploy
+```
+o vía API. No la guardes en el código.
+

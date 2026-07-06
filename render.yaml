@@ -1,0 +1,33 @@
+# render.yaml - Declarative deployment config for Render
+# Deploy this repo to Render using this file (Blueprint)
+# https://render.com/docs/blueprint-spec
+
+services:
+  - type: web
+    name: licitai-peru-api
+    env: python
+    region: oregon          # Change to frankfurt if you prefer EU
+    plan: free
+    autoDeploy: true
+    buildCommand: "pip install -r backend/requirements.txt"
+    startCommand: "cd backend && uvicorn main:app --host 0.0.0.0 --port $PORT --workers 2"
+    healthCheckPath: /health
+
+    envVars:
+      # These will be set in the Render dashboard (do NOT put real values here)
+      - key: ENV
+        value: production
+      - key: DEBUG
+        value: "false"
+
+      # Supabase (you already have these in your local .env)
+      - key: SUPABASE_URL
+        sync: false   # Set manually in dashboard
+      - key: SUPABASE_KEY
+        sync: false
+      - key: DATABASE_URL
+        sync: false
+
+      # Optional: for future embeddings
+      # - key: OPENAI_API_KEY
+      #   sync: false
