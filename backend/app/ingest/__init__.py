@@ -1,0 +1,1 @@
+"""Ingesta de datos OCDS del OECE para LicitAI Perú."""
