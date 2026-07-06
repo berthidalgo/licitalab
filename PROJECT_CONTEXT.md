@@ -37,19 +37,15 @@ Diferenciadores clave:
 - Día 12-14: Testing, documentación, optimizaciones y despliegue inicial
 
 ## 4. Estado Actual
-- Día 1 completado (replicado en workspace actual).
-- Archivos creados:
-  - README.md
-  - .gitignore
-  - .env.example
-  - backend/requirements.txt
-  - backend/main.py
-  - backend/app/core/config.py
-  - backend/app/__init__.py
-- Estructura de carpetas completa creada:
-  backend/app/{api, core, db, models, schemas, services, ingest, ml, rag, utils}
-  data/raw/, notebooks/, frontend/
-- Base lista para Día 2.
+- Día 1 completado (replicado + commiteado).
+- Día 2 en progreso / implementado:
+  - Sistema de ingesta OCDS robusto (downloader + processor + pipeline)
+  - Usa Polars (rápido) + httpx (streaming + retries)
+  - Archivos: backend/app/ingest/{downloader.py, processor.py, pipeline.py, run_ingest.py}
+  - data/raw/ y data/processed/ preparados
+- Git inicializado y conectado a: https://github.com/berthidalgo/licitalab.git
+- Estructura de carpetas completa.
+- Próximo: Probar con URL real + integración con Supabase.
 
 ## 5. Instrucciones para Grok Build (IMPORTANTE)
 
@@ -70,4 +66,10 @@ Cuando empieces una sesión nueva en Grok Build, sigue siempre este orden:
 - Mantener el enfoque B2B y diferenciado de la competencia.
 
 ## 7. Próximo Paso Inmediato
-Continuar con el **Día 2**: Ingesta robusta de datos OCDS del portal de datos abiertos del OECE.
+Día 2 base completado (ingesta). 
+Siguientes pasos recomendados:
+- Probar la ingesta con una URL real del portal
+- Guardar datos en Supabase (loader)
+- Mejorar extracción de campos (awards, suppliers, etc.)
+- Añadir scheduler / tarea diaria
+- Documentar en README cómo correr la ingesta
