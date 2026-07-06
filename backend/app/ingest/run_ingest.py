@@ -38,30 +38,46 @@ def main():
     parser.add_argument(
         "--url",
         type=str,
-        help="URL directa del archivo releases JSONL. Si no se pasa, usa la del .env o pide una.",
+        help="URL directa del archivo releases JSONL",
         default=None,
+    )
+    parser.add_argument(
+        "--load-to-supabase",
+        action="store_true",
+        help="Carga automáticamente los datos a Supabase después de procesarlos",
+    )
+    parser.add_argument(
+        "--table",
+        type=str,
+        default="licitaciones",
+        help="Nombre de la tabla en Supabase (default: licitaciones)",
     )
     args = parser.parse_args()
 
     settings = get_settings()
 
-    # TODO: En el futuro moveremos esto a settings
-    releases_url = args.url
+    releases_url = args.url or getattr(settings, "OCDS_RELEASES_URL", None)
 
     if not releases_url:
         print("⚠️  Debes proporcionar una URL de releases.")
         print("Ve a https://contratacionesabiertas.oece.gob.pe/descargas y copia el enlace de 'Releases' (JSON).")
-        print("\nEjemplo de ejecución:")
-        print('  python -m app.ingest.run_ingest --url "https://..."')
+        print("\nEjemplo:")
+        print('  python -m app.ingest.run_ingest --url "https://..." --load-to-supabase')
         sys.exit(1)
 
     pipeline = IngestionPipeline()
-    result = pipeline.run(releases_url=releases_url)
+    result = pipeline.run(
+        releases_url=releases_url,
+        load_to_supabase=args.load_to_supabase,
+        supabase_table=args.table,
+    )
 
     if result.get("status") == "success":
         print("\n🎉 Ingesta finalizada exitosamente")
         print(f"Registros procesados: {result.get('total_records')}")
         print(f"Archivo procesado: {result.get('processed_file')}")
+        if result.get("loaded_to_supabase"):
+            print(f"Datos cargados a Supabase tabla: {args.table}")
     else:
         print("\n❌ Ingesta falló")
         print(result)

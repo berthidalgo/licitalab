@@ -9,6 +9,7 @@ from datetime import datetime
 
 from .downloader import OCECDownloader
 from .processor import OCDSProcessor
+from .loader import SupabaseLoader
 
 logger = logging.getLogger(__name__)
 
@@ -28,6 +29,8 @@ class IngestionPipeline:
         self,
         releases_url: str,
         run_id: str | None = None,
+        load_to_supabase: bool = False,
+        supabase_table: str = "licitaciones",
     ) -> dict:
         """
         Ejecuta el pipeline completo de ingesta.
@@ -35,6 +38,8 @@ class IngestionPipeline:
         Args:
             releases_url: URL directa al archivo releases (JSONL) del OECE.
             run_id: Identificador opcional de la ejecución.
+            load_to_supabase: Si es True, carga los datos a Supabase.
+            supabase_table: Nombre de la tabla en Supabase.
 
         Returns:
             Diccionario con métricas de la ejecución.
@@ -62,7 +67,16 @@ class IngestionPipeline:
                 "processed_file": str(output_parquet),
                 "total_records": len(df),
                 "status": "success",
+                "loaded_to_supabase": False,
             }
+
+            # 3. Carga opcional a Supabase
+            if load_to_supabase:
+                loader = SupabaseLoader(table_name=supabase_table)
+                load_result = loader.insert_dataframe(df)
+                metrics["loaded_to_supabase"] = True
+                metrics["supabase_load_result"] = load_result
+                logger.info("✅ Datos cargados a Supabase")
 
             logger.info(f"✅ Ingesta completada exitosamente. Registros: {metrics['total_records']}")
             return metrics
