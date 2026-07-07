@@ -8,8 +8,10 @@ Uso:
 O con URL específica:
     python -m app.ingest.run_ingest --url "https://..."
 
-Obtén las URLs actualizadas desde:
-    https://contratacionesabiertas.oece.gob.pe/descargas
+Recomendado: Usar --use-api (API v1 paginada).
+Obtén más info y prueba en: https://contratacionesabiertas.oece.gob.pe/api
+
+Para bulk legacy: proporciona --url del JSONL desde https://contratacionesabiertas.oece.gob.pe/descargas
 """
 
 import argparse
@@ -52,24 +54,45 @@ def main():
         default="licitaciones",
         help="Nombre de la tabla en Supabase (default: licitaciones)",
     )
+    parser.add_argument(
+        "--use-api",
+        action="store_true",
+        default=True,
+        help="Usar la API oficial /api/v1/releases (recomendado, paginado). Default: True",
+    )
+    parser.add_argument(
+        "--limit",
+        type=int,
+        default=20,
+        help="Límite por página para API (máx aprox 20)",
+    )
+    parser.add_argument(
+        "--page",
+        type=int,
+        default=1,
+        help="Página a empezar (para API)",
+    )
+    parser.add_argument(
+        "--data-segmentation",
+        type=str,
+        default=None,
+        help="Filtro dataSegmentation ej: 2026-07 (muy útil para incremental)",
+    )
     args = parser.parse_args()
 
     settings = get_settings()
 
     releases_url = args.url or getattr(settings, "OCDS_RELEASES_URL", None)
 
-    if not releases_url:
-        print("⚠️  Debes proporcionar una URL de releases.")
-        print("Ve a https://contratacionesabiertas.oece.gob.pe/descargas y copia el enlace de 'Releases' (JSON).")
-        print("\nEjemplo:")
-        print('  python -m app.ingest.run_ingest --url "https://..." --load-to-supabase')
-        sys.exit(1)
-
     pipeline = IngestionPipeline()
     result = pipeline.run(
         releases_url=releases_url,
         load_to_supabase=args.load_to_supabase,
         supabase_table=args.table,
+        use_api=args.use_api,
+        api_limit=args.limit,
+        api_page=args.page,
+        data_segmentation=args.data_segmentation,
     )
 
     if result.get("status") == "success":
