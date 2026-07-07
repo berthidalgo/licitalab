@@ -81,14 +81,18 @@ Estrategia recomendada:
 
 Esto se activará cuando lleguemos a Día 5 (Scoring) y Días 6-7 (RAG).
 
-## 8. Próximo Paso Inmediato
-Día 2 base completado (ingesta). 
-Backend ya está **LIVE** en Render (licitai-peru-api).
+## 8. Próximo Paso Inmediato (Actualizado - Ejecutando Opción A)
+**Día actual: Día 2 (Ingesta) - En proceso de cierre**
 
-Siguientes pasos recomendados:
-- Completar integración real de ingesta con Supabase (probar con URL oficial).
-- Exponer endpoint en la API para disparar ingesta (útil mientras no haya scheduler).
-- Añadir OCDS_RELEASES_URL correctamente a Settings.
-- Mejorar extracción de campos en processor (awards, suppliers, etc.).
-- Añadir scheduler / tarea diaria (GitHub Actions o similar).
-- Documentar en README cómo correr la ingesta.
+Acciones ejecutadas ahora:
+- Endpoints agregados: POST /ingest/run, GET /ingest/status, GET /db/table-status, GET /licitaciones, GET /licitaciones/{ocid}
+- Verificación de tabla integrada en la API
+- Mejora en downloader (User-Agent)
+- Estrategia ML externa documentada
+
+Próximos pasos inmediatos para cerrar Día 2:
+1. El usuario debe ejecutar el SQL `backend/app/db/create_licitaciones_table.sql` en Supabase (si la tabla no existe).
+2. Obtener URL fresca de Releases desde https://contratacionesabiertas.oece.gob.pe/descargas
+3. Disparar ingesta real con load_to_supabase=true
+4. Verificar datos con /licitaciones y /db/table-status
+5. Marcar Día 2 como completado una vez que los datos fluyan.
