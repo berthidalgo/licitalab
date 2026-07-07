@@ -36,16 +36,24 @@ Diferenciadores clave:
 - Día 10-11: Frontend básico (Next.js)
 - Día 12-14: Testing, documentación, optimizaciones y despliegue inicial
 
-## 4. Estado Actual
-- Día 1 completado (replicado + commiteado).
-- Día 2 en progreso / implementado:
-  - Sistema de ingesta OCDS robusto (downloader + processor + pipeline)
-  - Usa Polars (rápido) + httpx (streaming + retries)
-  - Archivos: backend/app/ingest/{downloader.py, processor.py, pipeline.py, run_ingest.py}
-  - data/raw/ y data/processed/ preparados
-- Git inicializado y conectado a: https://github.com/berthidalgo/licitalab.git
-- Estructura de carpetas completa.
-- Próximo: Probar con URL real + integración con Supabase.
+## 4. Estado Actual (Actualizado 2026-07-07)
+- Día 1 completado.
+- **Día 2 (Ingesta)**: Código robusto implementado + estrategia migrada a API oficial.
+
+**Logros principales hasta hoy:**
+- Backend **LIVE** en Render (https://licitai-peru-api.onrender.com)
+- Nueva estrategia de ingesta: API oficial `https://contratacionesabiertas.oece.gob.pe/api/v1` (paginada + dataSegmentation) — mucho mejor que el bulk JSONL.
+- Endpoints en producción:
+  - `POST /ingest/run` (dispara ingesta en background usando API)
+  - `GET /ingest/status`
+  - `GET /db/table-status` (verifica tabla)
+  - `GET /licitaciones` + `GET /licitaciones/{ocid}`
+- Tabla `licitaciones` verificada vía API: **existe** y actualmente tiene **0 registros**.
+- Pipeline actualizado para soportar ingesta vía API/v1 (paginación, dataSegmentation, etc.).
+- Decisión ML: trabajo pesado (XGBoost + embeddings) se hará de forma externa (Kaggle/Colab/HF).
+
+- Git: https://github.com/berthidalgo/licitalab
+- Deploy: licitai-peru-api (Render free)
 
 ## 5. Instrucciones para Grok Build (IMPORTANTE)
 
@@ -81,18 +89,34 @@ Estrategia recomendada:
 
 Esto se activará cuando lleguemos a Día 5 (Scoring) y Días 6-7 (RAG).
 
-## 8. Próximo Paso Inmediato (Actualizado - Ejecutando Opción A)
-**Día actual: Día 2 (Ingesta) - En proceso de cierre**
+## 8. Estado al Pausar - 2026-07-07 (Fin de sesión)
 
-Acciones ejecutadas ahora:
-- Endpoints agregados: POST /ingest/run, GET /ingest/status, GET /db/table-status, GET /licitaciones, GET /licitaciones/{ocid}
-- Verificación de tabla integrada en la API (tabla existe, 0 registros actualmente)
-- Mejora en downloader (User-Agent)
-- Estrategia ML externa documentada
+**Día actual: Día 2 (Ingesta) - Muy avanzado**
 
-Próximos pasos inmediatos para cerrar Día 2:
-1. El usuario debe ejecutar el SQL `backend/app/db/create_licitaciones_table.sql` en Supabase (si la tabla no existe).
-2. Obtener URL fresca de Releases desde https://contratacionesabiertas.oece.gob.pe/descargas
-3. Disparar ingesta real con load_to_supabase=true
-4. Verificar datos con /licitaciones y /db/table-status
-5. Marcar Día 2 como completado una vez que los datos fluyan.
+**Lo que está listo:**
+- Backend completamente desplegado y vivo.
+- Ingesta migrada a la API oficial `/api/v1/releases` (forense completo realizado).
+- Soporte para paginación + `dataSegmentation` (ideal para cargas incrementales).
+- Tabla verificada: existe y accesible.
+- Endpoints de ingesta + consulta listos.
+- Decisión ML externa documentada.
+
+**Próxima sesión (cuando retomemos):**
+1. Disparar ingesta real usando la API (recomendado con `dataSegmentation` actual o páginas recientes).
+2. Verificar que los datos lleguen correctamente a Supabase.
+3. Mejorar extracción de campos en el processor (awards, suppliers, etc.).
+4. Cerrar oficialmente Día 2.
+5. Pasar a Día 3 (schema + preparación para scoring).
+
+**Comando útil para retomar:**
+```bash
+# Local
+python -m app.ingest.run_ingest --use-api --data-segmentation 2026-07 --load-to-supabase
+
+# O vía la API viva:
+curl -X POST https://licitai-peru-api.onrender.com/ingest/run \
+  -H "Content-Type: application/json" \
+  -d '{"load_to_supabase": true}'
+```
+
+**Pausa solicitada por el usuario.** Todo limpio y listo para continuar.
