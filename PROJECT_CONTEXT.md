@@ -65,11 +65,30 @@ Cuando empieces una sesión nueva en Grok Build, sigue siempre este orden:
 - Todo debe poder desplegarse en free tier (Render + Supabase).
 - Mantener el enfoque B2B y diferenciado de la competencia.
 
-## 7. Próximo Paso Inmediato
+## 7. Estrategia de Machine Learning y RAG (Actualizado 2026-07-07)
+**Decisión importante:** El trabajo pesado de ML (entrenamiento de XGBoost, generación de embeddings con sentence-transformers, etc.) se hará **principalmente de forma externa**.
+
+Razones:
+- Render free tier tiene limitaciones fuertes para builds pesados (torch + sentence-transformers).
+- El entrenamiento y precomputo de embeddings/scores se hace mucho mejor en herramientas con GPU: **Kaggle, Google Colab, Hugging Face**.
+- El backend en Render se enfocará en servir datos ya procesados.
+
+Estrategia recomendada:
+- Usar Kaggle/Colab/HF para entrenar modelos y generar embeddings.
+- Guardar resultados (scores + embeddings vectoriales) directamente en Supabase (tabla licitaciones + posiblemente tabla embeddings con pgvector).
+- El backend de FastAPI solo lee/expone los datos precomputados.
+- Más adelante evaluar si se necesita un servicio separado para inferencia ligera.
+
+Esto se activará cuando lleguemos a Día 5 (Scoring) y Días 6-7 (RAG).
+
+## 8. Próximo Paso Inmediato
 Día 2 base completado (ingesta). 
+Backend ya está **LIVE** en Render (licitai-peru-api).
+
 Siguientes pasos recomendados:
-- Probar la ingesta con una URL real del portal
-- Guardar datos en Supabase (loader)
-- Mejorar extracción de campos (awards, suppliers, etc.)
-- Añadir scheduler / tarea diaria
-- Documentar en README cómo correr la ingesta
+- Completar integración real de ingesta con Supabase (probar con URL oficial).
+- Exponer endpoint en la API para disparar ingesta (útil mientras no haya scheduler).
+- Añadir OCDS_RELEASES_URL correctamente a Settings.
+- Mejorar extracción de campos en processor (awards, suppliers, etc.).
+- Añadir scheduler / tarea diaria (GitHub Actions o similar).
+- Documentar en README cómo correr la ingesta.
