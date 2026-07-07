@@ -50,3 +50,17 @@ data/raw/*
 # OS
 .DS_Store
 Thumbs.db
+
+# Temp files, recovered secrets, render artifacts, scripts (never commit)
+recovered_tokens.txt
+envs.json
+rt.json
+render_*.json
+update*.json
+supabase_create.json
+tmp_pg/
+create_table.js
+setup_project.ps1
+*.log
+*.bak
+# Keep useful scripts if added later, but current temps ignored
