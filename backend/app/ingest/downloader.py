@@ -28,7 +28,13 @@ class OCECDownloader:
         self.output_dir.mkdir(parents=True, exist_ok=True)
         self.timeout = timeout
         self.max_retries = max_retries
-        self.client = httpx.Client(timeout=timeout, follow_redirects=True)
+        self.client = httpx.Client(
+            timeout=timeout,
+            follow_redirects=True,
+            headers={
+                "User-Agent": "LicitAI-Peru-Ingesta/1.0 (+https://github.com/berthidalgo/licitalab)"
+            },
+        )
 
     def download_releases(
         self,
