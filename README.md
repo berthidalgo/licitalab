@@ -90,3 +90,43 @@ render deploy
 ```
 o vía API. No la guardes en el código.
 
+## Keeping the free Render service awake (UptimeRobot + Cron)
+
+Render free tier services go to sleep after ~15 minutes of inactivity. We use two methods to keep `licitai-peru-api` always responsive:
+
+### 1. GitHub Actions Cron (built-in, no extra accounts)
+A scheduled workflow pings the health endpoint every 5 minutes.
+
+File: `.github/workflows/keep-awake.yml`
+
+It runs automatically on GitHub (uses your free Actions minutes, very low usage).
+
+You can also trigger it manually from the Actions tab.
+
+### 2. UptimeRobot (external monitor, recommended)
+UptimeRobot is free and pings every 5 minutes.
+
+**To set it up with your UPTK (from recovered_tokens.txt):**
+
+1. Go to https://uptimerobot.com and sign up / log in (use the account associated with the UPTK key).
+2. Add New Monitor:
+   - Monitor Type: HTTP(s)
+   - Friendly Name: licitai-peru-api-keepalive
+   - URL: `https://licitai-peru-api.onrender.com/health`
+   - Monitoring Interval: 5 minutes
+   - Alert Contacts: (use your defaults)
+
+Or use the API with your UPTK key (if your plan allows creation via API):
+
+```bash
+curl -X POST https://api.uptimerobot.com/v2/newMonitor \
+  -d "api_key=u3431891-263f883e979c8b82cb3e9f62&format=json&type=1&url=https://licitai-peru-api.onrender.com/health&friendly_name=licitai-peru-api-keepalive&interval=300"
+```
+
+The UPTK key from `recovered_tokens.txt` is: `u3431891-263f883e979c8b82cb3e9f62`
+
+Both methods ensure the backend stays warm for fast responses.
+
+## Health check
+El endpoint `/health` ya está implementado.
+
