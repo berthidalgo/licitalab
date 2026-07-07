@@ -37,19 +37,16 @@ def _run_ingestion_background(url: Optional[str], load_to_supabase: bool, table:
     global last_ingest_status
     try:
         releases_url = url or settings.OCDS_RELEASES_URL
-        if not releases_url:
-            last_ingest_status = {
-                "status": "error",
-                "error": "No URL provided and OCDS_RELEASES_URL not configured",
-            }
-            return
+        # Con use_api=True no es obligatorio el URL legacy
 
-        logger.info(f"🚀 Background ingestion started with url={releases_url}")
+        logger.info(f"🚀 Background ingestion started (API v1 mode)")
         pipeline = IngestionPipeline()
         result = pipeline.run(
             releases_url=releases_url,
             load_to_supabase=load_to_supabase,
             supabase_table=table,
+            use_api=True,
+            data_segmentation="2026-07",
         )
 
         if result.get("status") == "success":
