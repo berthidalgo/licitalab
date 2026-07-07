@@ -9,7 +9,7 @@ services:
     region: oregon          # Change to frankfurt if you prefer EU
     plan: free
     autoDeploy: true
-    buildCommand: "pip install -r backend/requirements.txt"
+    buildCommand: "pip install --only-binary=:all: -r backend/requirements.txt"
     startCommand: "cd backend && uvicorn main:app --host 0.0.0.0 --port $PORT --workers 2"
     healthCheckPath: /health
 
