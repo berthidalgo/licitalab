@@ -86,7 +86,7 @@ Esto se activará cuando lleguemos a Día 5 (Scoring) y Días 6-7 (RAG).
 
 Acciones ejecutadas ahora:
 - Endpoints agregados: POST /ingest/run, GET /ingest/status, GET /db/table-status, GET /licitaciones, GET /licitaciones/{ocid}
-- Verificación de tabla integrada en la API
+- Verificación de tabla integrada en la API (tabla existe, 0 registros actualmente)
 - Mejora en downloader (User-Agent)
 - Estrategia ML externa documentada
 
